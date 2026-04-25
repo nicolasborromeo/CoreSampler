@@ -134,6 +134,9 @@ CoreSamplerEditor::CoreSamplerEditor (CoreSamplerProcessor& p)
     addAndMakeVisible (transposeLabel);
 
     processorRef.thumbnail.addChangeListener (this);
+
+    // Repaint the waveform at 30 fps to animate the playback position indicator
+    startTimerHz (30);
 }
 
 CoreSamplerEditor::~CoreSamplerEditor()
@@ -254,6 +257,13 @@ void CoreSamplerEditor::changeListenerCallback (juce::ChangeBroadcaster*)
     repaint (waveformBounds);
 }
 
+void CoreSamplerEditor::timerCallback()
+{
+    // Only bother repainting when a sample is loaded
+    if (processorRef.thumbnail.getNumChannels() > 0)
+        repaint (waveformBounds);
+}
+
 // ============================================================
 // paint
 // ============================================================
@@ -341,6 +351,25 @@ void CoreSamplerEditor::paint (juce::Graphics& g)
                                (float) endX + 5, bottom,
                                (float) endX,     bottom - 9);
         g.fillPath (endHandle);
+
+        // ── Playback position indicator ───────────────────────────────
+        // The voice writes a normalised position (0–1 within the trimmed region).
+        // We draw a dark overlay over the already-played portion (start → playhead)
+        // plus a bright thin line at the playhead itself.
+        double playPos = processorRef.playbackPosition.load();
+        if (playPos >= 0.0)
+        {
+            int playX = startX + (int) (playPos * (endX - startX));
+
+            // Played region: dark overlay from start marker to playhead
+            g.setColour (juce::Colour (0x55000010));
+            g.fillRect (startX, waveformBounds.getY(),
+                        playX - startX, waveformBounds.getHeight());
+
+            // Playhead line: thin bright teal
+            g.setColour (juce::Colour (0xcc00eeff));
+            g.drawVerticalLine (playX, top, bottom);
+        }
     }
 
     // ── Bottom section panel backgrounds ─────────────────────────────

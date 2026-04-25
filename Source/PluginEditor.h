@@ -367,7 +367,8 @@ public:
 // Editor
 // ============================================================
 class CoreSamplerEditor : public juce::AudioProcessorEditor,
-                             public juce::ChangeListener
+                             public juce::ChangeListener,
+                             public juce::Timer
 {
 public:
     CoreSamplerEditor (CoreSamplerProcessor&);
@@ -381,6 +382,7 @@ public:
     void mouseUp   (const juce::MouseEvent&) override;
 
     void changeListenerCallback (juce::ChangeBroadcaster*) override;
+    void timerCallback() override;
 
 private:
     CoreSamplerProcessor& processorRef;

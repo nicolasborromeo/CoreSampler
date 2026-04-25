@@ -49,8 +49,8 @@ public:
     // srcSR  : shared reference to the processor's fileSampleRate
     //          (used to calculate pitch ratio — tells us the original pitch)
     CoreSamplerVoice (const juce::ADSR::Parameters& adsrP, const double& srcSR,
-                    const std::atomic<float>& fadeP)
-        : adsrParams (adsrP), fileSR (srcSR), fadeParam (fadeP) {}
+                      const std::atomic<float>& fadeP, std::atomic<double>& playbackPos)
+        : adsrParams (adsrP), fileSR (srcSR), fadeParam (fadeP), playbackPos (playbackPos) {}
 
     bool canPlaySound (juce::SynthesiserSound* s) override
     {
@@ -80,7 +80,7 @@ public:
     void stopNote (float /*velocity*/, bool allowTailOff) override
     {
         if (allowTailOff) { adsr.noteOff(); }
-        else              { clearCurrentNote(); adsr.reset(); position = 0.0; }
+        else              { clearCurrentNote(); adsr.reset(); position = 0.0; playbackPos.store (-1.0); }
     }
 
     void renderNextBlock (juce::AudioBuffer<float>& out,
@@ -125,9 +125,14 @@ public:
                 {
                     clearCurrentNote();
                     adsr.reset();
+                    playbackPos.store (-1.0);
                     break;
                 }
             }
+
+            // Publish normalised position (0–1 within trimmed region) for the UI
+            if (isVoiceActive())
+                playbackPos.store (juce::jlimit (0.0, 1.0, position / (double) len));
         }
     }
 
@@ -138,6 +143,7 @@ private:
     const juce::ADSR::Parameters& adsrParams;
     const double&                 fileSR;
     const std::atomic<float>&     fadeParam;
+    std::atomic<double>&          playbackPos;
     double     position    = 0.0;
     float      lgain = 0.0f, rgain = 0.0f;
     double     pitchRatio  = 0.0;
@@ -187,6 +193,10 @@ public:
 
     // ADSR state shared with all voices — updated each processBlock
     juce::ADSR::Parameters adsrParams;
+
+    // Normalised playback position (0–1 within trimmed region) written by the
+    // active voice every audio block. -1.0 means nothing is currently playing.
+    std::atomic<double> playbackPosition { -1.0 };
 
 private:
     juce::Synthesiser        sampler;

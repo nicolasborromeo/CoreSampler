@@ -106,7 +106,7 @@ CoreSamplerProcessor::CoreSamplerProcessor()
 
     for (int i = 0; i < NUM_VOICES; ++i)
         sampler.addVoice (new CoreSamplerVoice (adsrParams, fileSampleRate,
-                          *apvts.getRawParameterValue (ParamIDs::fade)));
+                          *apvts.getRawParameterValue (ParamIDs::fade), playbackPosition));
 
 }
 
