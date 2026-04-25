@@ -6,7 +6,7 @@
 // ============================================================
 // Custom Look & Feel — blue arc rotary knobs
 // ============================================================
-class LittleSamplerLookAndFeel : public juce::LookAndFeel_V4
+class CoreSamplerLookAndFeel : public juce::LookAndFeel_V4
 {
 public:
 
@@ -366,12 +366,12 @@ public:
 // ============================================================
 // Editor
 // ============================================================
-class LittleSamplerEditor : public juce::AudioProcessorEditor,
+class CoreSamplerEditor : public juce::AudioProcessorEditor,
                              public juce::ChangeListener
 {
 public:
-    LittleSamplerEditor (LittleSamplerProcessor&);
-    ~LittleSamplerEditor() override;
+    CoreSamplerEditor (CoreSamplerProcessor&);
+    ~CoreSamplerEditor() override;
 
     void paint (juce::Graphics&) override;
     void resized() override;
@@ -383,7 +383,7 @@ public:
     void changeListenerCallback (juce::ChangeBroadcaster*) override;
 
 private:
-    LittleSamplerProcessor& processorRef;
+    CoreSamplerProcessor& processorRef;
 
     // --- Load row ---
     juce::TextButton loadButton { "Load Sample" };
@@ -425,7 +425,7 @@ private:
     void setupKnob (juce::Slider& knob, juce::Label& label, const juce::String& text, int decimals = 2);
 
     // Declare laf last so it is destroyed before the knobs
-    LittleSamplerLookAndFeel laf;
+    CoreSamplerLookAndFeel laf;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LittleSamplerEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CoreSamplerEditor)
 };

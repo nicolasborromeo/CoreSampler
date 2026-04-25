@@ -1,9 +1,9 @@
-# LittleSampler
+# Core Sampler
 
 A compact, polyphonic sampler plugin built with JUCE 8 — inspired by Ableton Simpler.  
 Load any audio file, trim it with visual markers, shape it with an ADSR envelope and filter, and play it chromatically across your MIDI keyboard.
 
-![LittleSampler UI](docs/screenshot.png)
+![Core Sampler UI](docs/screenshot.png)
 
 ---
 
@@ -85,7 +85,7 @@ cmake -B build -DCMAKE_BUILD_TYPE=Debug
 ## Project Structure
 
 ```
-LittleSampler/
+Core Sampler/
 ├── Source/
 │   ├── PluginProcessor.cpp/h   — Audio engine, ADSR, filter, MIDI, state
 │   └── PluginEditor.cpp/h      — UI, waveform, knobs, look & feel

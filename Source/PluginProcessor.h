@@ -35,20 +35,20 @@ struct BufferReader : public juce::AudioFormatReader
 };
 
 // ============================================================
-// LSSamplerVoice
+// CoreSamplerVoice
 //
 // Custom synthesiser voice that reads from a SamplerSound but
 // applies OUR ADSR parameters (so the knobs actually work).
 // juce::SamplerVoice bakes ADSR in at sound-creation time and
 // exposes no way to change it dynamically — this solves that.
 // ============================================================
-class LSSamplerVoice : public juce::SynthesiserVoice
+class CoreSamplerVoice : public juce::SynthesiserVoice
 {
 public:
     // adsrP  : shared reference to the processor's ADSR struct
     // srcSR  : shared reference to the processor's fileSampleRate
     //          (used to calculate pitch ratio — tells us the original pitch)
-    LSSamplerVoice (const juce::ADSR::Parameters& adsrP, const double& srcSR,
+    CoreSamplerVoice (const juce::ADSR::Parameters& adsrP, const double& srcSR,
                     const std::atomic<float>& fadeP)
         : adsrParams (adsrP), fileSR (srcSR), fadeParam (fadeP) {}
 
@@ -147,13 +147,13 @@ private:
 };
 
 // ============================================================
-// LittleSamplerProcessor
+// CoreSamplerProcessor
 // ============================================================
-class LittleSamplerProcessor : public juce::AudioProcessor
+class CoreSamplerProcessor : public juce::AudioProcessor
 {
 public:
-    LittleSamplerProcessor();
-    ~LittleSamplerProcessor() override;
+    CoreSamplerProcessor();
+    ~CoreSamplerProcessor() override;
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -161,7 +161,7 @@ public:
 
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override             { return true; }
-    const juce::String getName() const override { return "LittleSampler"; }
+    const juce::String getName() const override { return "Core Sampler"; }
     bool acceptsMidi() const override           { return true; }
     bool producesMidi() const override          { return false; }
     double getTailLengthSeconds() const override { return 0.0; }
@@ -199,5 +199,5 @@ private:
     juce::dsp::StateVariableTPTFilter<float> filterL, filterR;
     juce::dsp::StateVariableTPTFilter<float> filterL2, filterR2;  // second stage for 24dB
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LittleSamplerProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CoreSamplerProcessor)
 };

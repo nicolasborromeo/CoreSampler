@@ -9,7 +9,7 @@ static const juce::Colour kDivider   { 0xff2a2a45 };
 // ============================================================
 // Constructor
 // ============================================================
-LittleSamplerEditor::LittleSamplerEditor (LittleSamplerProcessor& p)
+CoreSamplerEditor::CoreSamplerEditor (CoreSamplerProcessor& p)
     : AudioProcessorEditor (&p),
       processorRef  (p),
       filterTypeAtt (p.apvts, "filterType", filterTypeBox),
@@ -136,7 +136,7 @@ LittleSamplerEditor::LittleSamplerEditor (LittleSamplerProcessor& p)
     processorRef.thumbnail.addChangeListener (this);
 }
 
-LittleSamplerEditor::~LittleSamplerEditor()
+CoreSamplerEditor::~CoreSamplerEditor()
 {
     processorRef.thumbnail.removeChangeListener (this);
     // Clear look-and-feel before laf is destroyed
@@ -151,7 +151,7 @@ LittleSamplerEditor::~LittleSamplerEditor()
         knob->setLookAndFeel (nullptr);
 }
 
-void LittleSamplerEditor::setupKnob (juce::Slider& knob, juce::Label& label,
+void CoreSamplerEditor::setupKnob (juce::Slider& knob, juce::Label& label,
                                      const juce::String& text, int decimals)
 {
     // setLookAndFeel MUST come first — setTextBoxStyle calls createSliderTextBox,
@@ -170,7 +170,7 @@ void LittleSamplerEditor::setupKnob (juce::Slider& knob, juce::Label& label,
     addAndMakeVisible (label);
 }
 
-void LittleSamplerEditor::updateSlopeButtons()
+void CoreSamplerEditor::updateSlopeButtons()
 {
     int idx = (int) processorRef.apvts.getRawParameterValue ("filterSlope")->load();
     slopeButton12.setToggleState (idx == 0, juce::dontSendNotification);
@@ -180,7 +180,7 @@ void LittleSamplerEditor::updateSlopeButtons()
 // ============================================================
 // Waveform drag — start and end point
 // ============================================================
-void LittleSamplerEditor::setStartPoint (int mouseX)
+void CoreSamplerEditor::setStartPoint (int mouseX)
 {
     if (waveformBounds.getWidth() <= 0) return;
     float fraction = juce::jlimit (0.0f, 0.9f,
@@ -190,7 +190,7 @@ void LittleSamplerEditor::setStartPoint (int mouseX)
     repaint (waveformBounds);
 }
 
-void LittleSamplerEditor::setEndPoint (int mouseX)
+void CoreSamplerEditor::setEndPoint (int mouseX)
 {
     if (waveformBounds.getWidth() <= 0) return;
     float startFrac = processorRef.apvts.getRawParameterValue ("startPoint")->load();
@@ -201,7 +201,7 @@ void LittleSamplerEditor::setEndPoint (int mouseX)
     repaint (waveformBounds);
 }
 
-void LittleSamplerEditor::mouseDown (const juce::MouseEvent& e)
+void CoreSamplerEditor::mouseDown (const juce::MouseEvent& e)
 {
     if (! waveformBounds.contains (e.getPosition())) return;
 
@@ -227,13 +227,13 @@ void LittleSamplerEditor::mouseDown (const juce::MouseEvent& e)
     }
 }
 
-void LittleSamplerEditor::mouseDrag (const juce::MouseEvent& e)
+void CoreSamplerEditor::mouseDrag (const juce::MouseEvent& e)
 {
     if (isDraggingStart) setStartPoint (e.x);
     if (isDraggingEnd)   setEndPoint   (e.x);
 }
 
-void LittleSamplerEditor::mouseUp (const juce::MouseEvent&)
+void CoreSamplerEditor::mouseUp (const juce::MouseEvent&)
 {
     if (isDraggingStart)
     {
@@ -249,7 +249,7 @@ void LittleSamplerEditor::mouseUp (const juce::MouseEvent&)
     }
 }
 
-void LittleSamplerEditor::changeListenerCallback (juce::ChangeBroadcaster*)
+void CoreSamplerEditor::changeListenerCallback (juce::ChangeBroadcaster*)
 {
     repaint (waveformBounds);
 }
@@ -257,7 +257,7 @@ void LittleSamplerEditor::changeListenerCallback (juce::ChangeBroadcaster*)
 // ============================================================
 // paint
 // ============================================================
-void LittleSamplerEditor::paint (juce::Graphics& g)
+void CoreSamplerEditor::paint (juce::Graphics& g)
 {
     g.fillAll (kBg);
 
@@ -381,7 +381,7 @@ void LittleSamplerEditor::paint (juce::Graphics& g)
 // ============================================================
 // resized
 // ============================================================
-void LittleSamplerEditor::resized()
+void CoreSamplerEditor::resized()
 {
     // 6 px outer horizontal margin — consistent across every row
     auto area = getLocalBounds().reduced (6, 0);

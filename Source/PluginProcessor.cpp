@@ -24,7 +24,7 @@ namespace ParamIDs
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout
-LittleSamplerProcessor::createParameterLayout()
+CoreSamplerProcessor::createParameterLayout()
 {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
 
@@ -96,7 +96,7 @@ LittleSamplerProcessor::createParameterLayout()
     return { params.begin(), params.end() };
 }
 
-LittleSamplerProcessor::LittleSamplerProcessor()
+CoreSamplerProcessor::CoreSamplerProcessor()
     : AudioProcessor (BusesProperties()
                         .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
       apvts (*this, nullptr, "Parameters", createParameterLayout()),
@@ -105,12 +105,12 @@ LittleSamplerProcessor::LittleSamplerProcessor()
     formatManager.registerBasicFormats();
 
     for (int i = 0; i < NUM_VOICES; ++i)
-        sampler.addVoice (new LSSamplerVoice (adsrParams, fileSampleRate,
+        sampler.addVoice (new CoreSamplerVoice (adsrParams, fileSampleRate,
                           *apvts.getRawParameterValue (ParamIDs::fade)));
 
 }
 
-LittleSamplerProcessor::~LittleSamplerProcessor() {}
+CoreSamplerProcessor::~CoreSamplerProcessor() {}
 
 // ============================================================
 // loadSample
@@ -119,7 +119,7 @@ LittleSamplerProcessor::~LittleSamplerProcessor() {}
 // thumbnail, and builds the first SamplerSound.
 // Called from the editor's load button (message thread).
 // ============================================================
-void LittleSamplerProcessor::loadSample (const juce::File& file)
+void CoreSamplerProcessor::loadSample (const juce::File& file)
 {
     auto* reader = formatManager.createReaderFor (file);
     if (reader == nullptr) return;
@@ -151,7 +151,7 @@ void LittleSamplerProcessor::loadSample (const juce::File& file)
 // starting at the current start-point position.
 // Safe to call from the message thread.
 // ============================================================
-void LittleSamplerProcessor::rebuildSamplerSound()
+void CoreSamplerProcessor::rebuildSamplerSound()
 {
     if (fileData.getNumSamples() == 0) return;
 
@@ -186,7 +186,7 @@ void LittleSamplerProcessor::rebuildSamplerSound()
 // ============================================================
 // prepareToPlay — called before audio starts
 // ============================================================
-void LittleSamplerProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void CoreSamplerProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     sampler.setCurrentPlaybackSampleRate (sampleRate);
 
@@ -213,7 +213,7 @@ void LittleSamplerProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
     filterR2.setType (juce::dsp::StateVariableTPTFilterType::lowpass);
 }
 
-void LittleSamplerProcessor::releaseResources()
+void CoreSamplerProcessor::releaseResources()
 {
     filterL.reset();  filterR.reset();
     filterL2.reset(); filterR2.reset();
@@ -222,7 +222,7 @@ void LittleSamplerProcessor::releaseResources()
 // ============================================================
 // processBlock — called hundreds of times per second
 // ============================================================
-void LittleSamplerProcessor::processBlock (juce::AudioBuffer<float>& buffer,
+void CoreSamplerProcessor::processBlock (juce::AudioBuffer<float>& buffer,
                                            juce::MidiBuffer& midiMessages)
 {
     float volume     = apvts.getRawParameterValue (ParamIDs::volume)->load()
@@ -231,7 +231,7 @@ void LittleSamplerProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     float filterRes  = apvts.getRawParameterValue (ParamIDs::filterRes)->load();
     int   transpose  = (int) apvts.getRawParameterValue (ParamIDs::transpose)->load();
 
-    // Update shared ADSR struct — each LSSamplerVoice reads this every block
+    // Update shared ADSR struct — each CoreSamplerVoice reads this every block
     adsrParams.attack  = apvts.getRawParameterValue (ParamIDs::attack)->load();
     adsrParams.decay   = apvts.getRawParameterValue (ParamIDs::decay)->load();
     adsrParams.sustain = apvts.getRawParameterValue (ParamIDs::sustain)->load();
@@ -297,26 +297,26 @@ void LittleSamplerProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     buffer.applyGain (volume);
 }
 
-void LittleSamplerProcessor::getStateInformation (juce::MemoryBlock& destData)
+void CoreSamplerProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     auto state = apvts.copyState();
     std::unique_ptr<juce::XmlElement> xml (state.createXml());
     copyXmlToBinary (*xml, destData);
 }
 
-void LittleSamplerProcessor::setStateInformation (const void* data, int sizeInBytes)
+void CoreSamplerProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
     if (xmlState != nullptr && xmlState->hasTagName (apvts.state.getType()))
         apvts.replaceState (juce::ValueTree::fromXml (*xmlState));
 }
 
-juce::AudioProcessorEditor* LittleSamplerProcessor::createEditor()
+juce::AudioProcessorEditor* CoreSamplerProcessor::createEditor()
 {
-    return new LittleSamplerEditor (*this);
+    return new CoreSamplerEditor (*this);
 }
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new LittleSamplerProcessor();
+    return new CoreSamplerProcessor();
 }
