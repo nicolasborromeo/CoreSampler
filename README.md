@@ -3,7 +3,7 @@
 A compact, polyphonic sampler plugin built with JUCE 8 — inspired by Ableton Simpler.  
 Load any audio file, trim it with visual markers, shape it with an ADSR envelope and filter, and play it chromatically across your MIDI keyboard.
 
-![Core Sampler UI](docs/screenshot.png)
+<img width="718" height="378" alt="core-sampler2" src="https://github.com/user-attachments/assets/fae04d8b-659a-4375-aae6-3c3148eb81f2" />
 
 ---
 
